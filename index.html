@@ -2,33 +2,28 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>demo gallary</title>
+	<title>flying card</title>
 	<style>
-		body{
-			background-color: #000; 
+		body{    
+			background-color: #000;  
+			cursor:url("icon/pointer.cur"),auto 
 		}
 		 html,body,.wrap{
             margin: 0;
             padding: 0;
-            height: 100%;
+            height: 100%; 
         }
 		.wrap{
 		    -webkit-perspective:800px;
  			perspective:800px;
  			width: 100%;   
  			overflow: hidden;
-
- 			/*position: absolute; */
- 		/*	top:50%;
-			margin-top: -300px;*/
 			background-color: #000; 
 		}  
 		
 		.center_dot{
 			width: 1px;
-			height: 1px;
-			/*border: 1px solid #ccc;*/  
-			background-color: red;  
+			height: 1px; 
 			position: absolute;
 			left:50%;     
 			top:50%;  		
@@ -38,10 +33,6 @@
 			height: 370px;
 			position:absolute;
 			z-index: 1;   
-		/*	top:50%;  
-			left:50%;   
-			margin-top: -185px;
-			margin-left: -85px;*/
 			transition: all 0.6s;
 		}
 		.center{
@@ -85,53 +76,152 @@
 		#collect{
 			position: fixed;
 			top: 20px;
-			left: 10px; 
+			left: 20px; 
 			background-color: #ffc0cb;
-			border-radius: 4px;
+			border-radius: 6px;
 			border-color: #ffc0cb;  
-			color: #fff;
+			color: #fff; 
+			font-size: 16px; 
+			padding: 6px 16px;
 		}
 		#collect:hover{
 			border-color: #ffc0cb;  
 			color: #ffc0cb;  
 			background-color: #fff;  
+		} 
+		#hint{
+			position: fixed;
+			top: 54px;
+			left: 20px; 
+			color: #ffc0cb;  
+			font-size: 18px;
+			display: none
 		}
-	</style>  
+		#finalCall{
+			position: fixed;
+			top: 110px;
+			left: 20px;     
+			color: #ffc0cb;  
+			font-size: 18px;
+			display: none 
+		}
+		#card_info{
+			position: fixed;
+		}
+		#card_name{
+			color: #fff;
+			font-size: 36px;
+		}
+		#card_name_cn{
+			color: #fff;
+			font-size: 36px;
+		}
+		#card_expression{
+			color: #fff;  
+			font-size: 16px;  
+			line-height: 30px;
+			width: 340px;
+		}
+	</style>    
+	<script src='template.js'></script>
 </head>   
 <body>   
 	<div class="wrap"> 
 		<div class="photo photo-front" id="card_{{id}}" onclick="turn(this)">
 			<div class="photo-wrap">
 				<div class="side front-side">
-					<img src="img/{{img}}_1.GIF" alt="">
+					<img src="img/{{img}}_1.gif" alt="">
 				</div>
 				<div class="side back-side"> 
-					<img src="img/{{img}}_2.GIF" alt="">
+					<img src="img/{{img}}_2.gif" alt="">
 				</div> 
-			</div>  
-		</div>
+			</div>    
+		</div>  
 	</div>
-	<button  id='collect'> collect</button> 
-	
+
+	<button  id='collect'> 点我集合库洛牌</button>  
+	<p id="hint">点击翻转库洛牌进行占卜哦~</p>
+	<div id="finalCall">旋转吧~命运的转盘</div>
+	<div id="card_info" style="display: none">
+		<div id="card_name"></div>  
+		<div id="card_name_cn"></div>
+		<div id="card_expression"></div>
+	</div>
+	  
 	<div style="display: none" id="template_1">
 	 	<div class="card photo-front" id="card_{{id}}" onclick="turn(this)">
 			<div class="photo-wrap">
 				<div class="side front-side">
-					<img src="img/{{img}}_1.GIF" alt="">
+					<img src="img/{{img}}_1.gif" alt="">
 				</div>
-				<div class="side back-side">
-					<img src="img/{{img}}_2.GIF" alt="">
+				<div class="side back-side"> 
+					<img src="img/{{img}}_2.gif" alt="">
 				</div> 
 			</div>
 		</div>
 	 </div>    
 	<script>
+		console.log(card_template)
 		const g_data = ['illusion','light','wood','big',
 						'flower','mirror','return','shield',
 						'silent','storm','sword','wind','wood']   
-		var g_interval 
 
-		function getDom(selector){ // 。. class # id
+		const g_card_info ={
+			'wood':{
+				'name': '「树」牌',
+				'desc':'稳健的成长，或者代表着发展。在人际关系上得到信赖，与朋友缔结下深厚的关系。不仅才能与能力得以发挥，并能得到许多赞赏'
+			},
+			'illusion':{
+				'name':'「幻」牌',
+				'desc':'你的心思一直被紧迫而来的表面上的变化所占据，有不愿面对现实的倾向。即使生活或工作的环境改变，也别忘记每个人都拥有适应力。'
+			},
+			'light':{
+				'name':'「光」牌',
+				'desc':'身为耀眼光辉的存在，你聚集众多注目焦点于一身。不论做什么都能顺利进行，有着最棒的运气；不仅拿手的事与才能更能发挥，单恋的人也将有机会来临。'
+			},
+			'big':{
+				'name':'「大」牌',
+				'desc':'知识欲极为旺盛的时期。对于做好的计划，自己的可塑性，更是加以提升的好机会。　可以期待你一直以为不可能实现的爱情与梦想成真。'
+			},
+			'flower':{
+				'name':'「花」牌',
+				'desc':'今的努力终于开花结果了，而且绝佳的机会也即将到来！　只要能以乐观进取的心情，带着自信行动，一切都会往好的方向展开。'
+			},
+			'mirror':{
+				'name':'「镜」牌',
+				'desc':'自己本身所拥有的长处和短处，可以藉由他人对你的态度中知道。尤其是让你感觉到讨厌的人的缺点，更常常是你本身缺点的反射'
+			},
+			'return':{
+				'name':'「戾」牌',
+				'desc':'挂在心上的事，一直放着没处理的事，就趁这个机会一起解决了吧。被贴上畏首畏尾卷标的人也得以挽回名誉。　明快干脆的作为让你运气上升'
+			},
+			'shield':{
+				'name':'「盾」牌',
+				'desc':'即使有危机接近你，但你身边的所有人会把你保护得固若金汤。　尤其如果是为了爱与和平，则有可能得到更为强大的力量。'
+			},
+			'silent':{
+				'name':'「静」牌',
+				'desc':'乍看之下虽然不起眼，但你的正直早已被所有的人肯定。　你理所当然过着踏实并已完成自己责任的生活，最近或许会有好消息降临喔。'
+			},
+			'storm':{
+				'name':'「岚」牌',
+				'desc':'一直压抑着的感情或恐惧一口气表面化，可能遇到严厉的状况。　着想改善状况，必须割舍消极的一面，你可以对自己的主张再多坚持一点。'
+			},
+			'sword':{
+				'name':'「剑」牌',
+				'desc':'真实与力量的象征。　一切事实都能够按照你的心意顺利进行。　尤其是如果你播下的是真实的种子，一定能够得到最棒的收获。'
+			},
+			'wind':{
+				'name':'「风」牌',
+				'desc':'变化、飞跃的时期。　能够获得有意义情报的可能性也很大。　要比平常多注意状况，详加观察。　当看准时机已到时，下定决心也是很重要的。'
+			}
+		}   
+		var g_interval 
+		var g_status
+		var g_opactiy_timeout_list = [] 
+		
+
+		function getDom(selector){ 
 			if(selector[0] == '.'){
 				return document.querySelector(selector)
 			}else{			
@@ -141,33 +231,78 @@
 		}
 
 
-		function getRandomV(min,max){// ru [2,5] => 2,3,4
+		function getRandomV(min,max){
 			return min+Math.floor(Math.random()*(max-min))
 		}
 
 		function clear(){
-			let _wrap_node = getDom('.wrap')   
+			let _wrap_node = getDom('.wrap')      
 			_wrap_node.innerHTML = ''
 		}
 
-		function turn(ele){  
+		function turn(ele){ 
+			var isShowBack = false 
 			var clsName = ele.className
+
+			var targetCardId = ele.id.split('_')[1]
 			if(clsName.indexOf('center') != -1){
 				return
 			}
-
-			
+  
+			  
 			if(/photo-front/.test(clsName)){  
-				ele.className = clsName.replace('photo-front','photo-back') 	
+				ele.className = clsName.replace('photo-front','photo-back') 
+				isShowBack = true	
 			}else{
 				ele.className = clsName.replace('photo-back','photo-front') 
-			}
-		}
+				isShowBack = false
+			}   
+
+			if(g_status == 'spin' && isShowBack){   
+            
+				getDom('card_info').style.display='block'   
+
+				var random = Math.ceil(Math.random()*10)
+				if(random>5){
+					var maxW = window.screen.availWidth
+					getDom('card_info').style.left = getRandomV((maxW-300),(maxW-400))+'px'  
+				}else{
+					getDom('card_info').style.left = getRandomV(20,200)+'px'  
+				}
+				
+
+
+				getDom('card_info').style.top = getRandomV(20,500)+'px'
+
+
+
+				getDom('card_name').innerHTML = "The "+ g_data[targetCardId]
+				getDom('card_name_cn').innerHTML = g_card_info[ g_data[targetCardId]].name
+				getDom('card_expression').innerHTML = g_card_info[ g_data[targetCardId]].desc 
+
+				g_opactiy_timeout_list.forEach((item,index)=>{   
+					clearTimeout(item)
+				})
+				g_opactiy_timeout_list = [] 
+
+				var opacity     
+				for(var  i = 0;i<=10;i++){     
+					(function(number){     
+						opacity =setTimeout(function(){  
+							getDom('card_info').style.opacity= 1-(number*0.1)  
+						},1400*i)                  
+						g_opactiy_timeout_list.push(opacity)    
+					})(i)     
+				}    
+					  
+			}   
+		}    
 		   
 		// scene 1 scatter + center spin
 		function initScatter(){
 			let _wrap_node = document.querySelector('.wrap')  
-			let template = _wrap_node.innerHTML
+			// let template = _wrap_node.innerHTML   
+			let template = card_template
 			let templateArr = [] 
 			let fragmentStr         
 			g_data.forEach((item, index)=>{
@@ -192,13 +327,13 @@
 					marginalNode = getDom('card_'+(index)) 
 					marginalNode.style.top =getRandomV(-100,600)+'px'
 					marginalNode.style.left =getRandomV(-50,1300)+'px'
-					marginalNode.style.transform= 'rotate('+getRandomV(-150,150)+'deg)'     
+					marginalNode.style.transform= 'rotate('+getRandomV(-150,150)+'deg)' 
 				}
-			})     
+			})      
 			
 		}     
-
-		function marginalRotate(){
+  
+		function marginalRotate(){ 
 			var photo_list = document.querySelectorAll('.photo')
 			 
 			setTimeout(function(){
@@ -264,8 +399,7 @@
 				item.style.transform = 'rotate('+(90-index*(360/count))+'deg)' 
 				item.style.display = 'none';   
 
-				(function(){ 
-					console.log(item,index)  
+				(function(){  
 					setTimeout(()=>{
 						item.style.display = 'block'
 					},1000*index)       
@@ -275,13 +409,30 @@
       
 		function spinCircle(){  
 			var wrap = getDom('.wrap')  
-  
+  			var isSpinStart = false
 			var times = 1    
 			setInterval(function(){  
 				wrap.style.transform = 'rotate('+30*times+'deg)'
 				times+=1   
+				if(isSpinStart == false){   
+					isSpinStart = true
+					showCall()     
+				}
 
 			},3000)   
+		}
+
+		function showHint(){
+			var hint = getDom('hint')
+			hint.style.display = 'block'
+		}
+		function showCall(){
+			var call = getDom('finalCall')
+			call.style.display = 'block'
+		}
+		function hideCollect(){
+			var collect = getDom('collect')
+			collect.style.display = 'none'
 		}
 
 
@@ -294,6 +445,9 @@
 				// start scene 2   
 				initCircle()           
 	   			
+	   			g_status = 'spin'
+	   			showHint()
+	   			hideCollect()       
 	   			// spinCircle()       
 				setTimeout(spinCircle,g_data.length*1000)    
 			})   
@@ -310,7 +464,7 @@
 		    
   
 	</script>    
-		}
+		
 </body> 
 </html>  
 
