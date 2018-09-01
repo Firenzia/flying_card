@@ -5,9 +5,9 @@ var fragement = ['<div class="photo photo-front" id="card_{{id}}" onclick="turn(
 				'</div>',
 				'<div class="side back-side"> ',
 				'<img src="img/{{img}}_2.GIF" alt="">',
-				'</div> ',
-				'</div> ',
-				'</div> '
+				'</div>',
+				'</div>',
+				'</div>' 
 ]
-var card_template= fragement.join('')
+var card_template= fragement.join('') 
 
